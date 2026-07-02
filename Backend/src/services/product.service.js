@@ -1,3 +1,4 @@
+const AppError = require('../errors/AppError');
 const productRepository = require('../repositories/product.repository');
 const { createRedisClient } = require('../config/redis');
 const {
@@ -31,7 +32,22 @@ async function invalidateProductsCache() {
   await redis.del(PRODUCTS_CACHE_KEY);
 }
 
+async function searchProduct(term) {
+  const results = await productRepository.searchByTerm(term);
+
+  if (!results.length) {
+    throw new AppError(404, 'not_found', 'Nenhum produto encontrado para esta busca.');
+  }
+
+  return {
+    query: term.trim(),
+    results,
+    bestMatch: results[0],
+  };
+}
+
 module.exports = {
   listProducts,
   invalidateProductsCache,
+  searchProduct,
 };

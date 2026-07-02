@@ -46,4 +46,12 @@ export function fetchOrderStatus(uid) {
   return request(`/orders/${uid}`);
 }
 
+export function fetchOrders() {
+  return request('/orders');
+}
+
+export function resetDatabase() {
+  return request('/admin/reset', { method: 'POST' });
+}
+
 export { ApiError, API_BASE_URL };

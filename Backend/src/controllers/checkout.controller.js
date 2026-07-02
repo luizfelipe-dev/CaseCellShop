@@ -23,7 +23,17 @@ async function getOrderStatus(req, res, next) {
   }
 }
 
+async function listOrders(_req, res, next) {
+  try {
+    const orders = await checkoutService.listOrders();
+    res.json(orders);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   checkout,
   getOrderStatus,
+  listOrders,
 };

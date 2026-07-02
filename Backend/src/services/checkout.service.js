@@ -90,6 +90,30 @@ async function getOrderByUid(uid) {
     throw new AppError(404, 'not_found', 'Pedido não encontrado.');
   }
 
+  return formatOrder(order);
+}
+
+async function listOrders() {
+  const orders = await orderRepository.findAll();
+  const productIds = [...new Set(orders.map((order) => toIdString(order.productId)))];
+
+  const products = await Promise.all(
+    productIds.map((id) => productRepository.findById(id))
+  );
+
+  const productNameById = new Map(
+    products
+      .filter(Boolean)
+      .map((product) => [toIdString(product._id), product.name])
+  );
+
+  return orders.map((order) => ({
+    ...formatOrder(order),
+    productName: productNameById.get(toIdString(order.productId)) || 'Produto removido',
+  }));
+}
+
+function formatOrder(order) {
   return {
     uid: order.uid,
     orderId: toIdString(order._id),
@@ -106,4 +130,5 @@ async function getOrderByUid(uid) {
 module.exports = {
   processCheckout,
   getOrderByUid,
+  listOrders,
 };

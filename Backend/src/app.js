@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const productRoutes = require('./routes/product.routes');
 const checkoutRoutes = require('./routes/checkout.routes');
+const orderRoutes = require('./routes/order.routes');
+const adminRoutes = require('./routes/admin.routes');
 const errorHandler = require('./middlewares/errorHandler');
 
 function createApp() {
@@ -16,7 +18,8 @@ function createApp() {
 
   app.use('/products', productRoutes);
   app.use('/checkout', checkoutRoutes);
-  app.use('/orders', checkoutRoutes);
+  app.use('/orders', orderRoutes);
+  app.use('/admin', adminRoutes);
 
   app.use(errorHandler);
 

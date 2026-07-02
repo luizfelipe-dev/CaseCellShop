@@ -5,13 +5,17 @@ function formatPrice(price) {
   });
 }
 
-function ProductList({ products, selectedProductId, onSelect, isLoading }) {
+function ProductList({ products, selectedProductId, onSelect, isLoading, emptyMessage }) {
   if (isLoading) {
     return <p className="loading-text">Carregando produtos...</p>;
   }
 
   if (!products.length) {
-    return <p className="empty-text">Nenhum produto disponível no momento.</p>;
+    return (
+      <p className="empty-text">
+        {emptyMessage || 'Nenhum produto disponível no momento.'}
+      </p>
+    );
   }
 
   return (
@@ -41,7 +45,7 @@ function ProductList({ products, selectedProductId, onSelect, isLoading }) {
               <h3>{product.name}</h3>
               <p className="product-card__price">{formatPrice(product.price)}</p>
               <p className={`product-card__stock ${outOfStock ? 'product-card__stock--empty' : ''}`}>
-                {outOfStock ? 'Sem estoque' : `${product.stock} un.`}
+                {outOfStock ? 'Esgotado' : `${product.stock} un.`}
               </p>
             </div>
           </button>

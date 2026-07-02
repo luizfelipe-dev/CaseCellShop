@@ -26,7 +26,7 @@ function startErpWorker() {
         await erpSimulator.processOrder();
 
         await orderRepository.updateStatus(orderId, ORDER_STATUS.COMPLETED, {
-          message: 'Pedido processado com sucesso no ERP.',
+          message: 'Pedido processado com sucesso!.',
         });
 
         console.log(JSON.stringify({

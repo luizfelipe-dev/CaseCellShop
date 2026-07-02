@@ -4,6 +4,10 @@ async function findByUid(uid) {
   return Order.findOne({ uid }).lean();
 }
 
+async function findAll() {
+  return Order.find().sort({ createdAt: -1 }).lean();
+}
+
 async function create(orderData) {
   return Order.create(orderData);
 }
@@ -18,6 +22,7 @@ async function updateStatus(orderId, status, extra = {}) {
 
 module.exports = {
   findByUid,
+  findAll,
   create,
   updateStatus,
 };

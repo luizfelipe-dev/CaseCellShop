@@ -9,6 +9,16 @@ async function listProducts(_req, res, next) {
   }
 }
 
+async function searchProduct(req, res, next) {
+  try {
+    const product = await productService.searchProduct(req.query.q || '');
+    res.json(product);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   listProducts,
+  searchProduct,
 };

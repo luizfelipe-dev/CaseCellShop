@@ -49,7 +49,7 @@ Não esperamos:
 ● uso obrigatório de Docker;
 ● deploy em cloud;
 ● mensageria real em produção;
-●  layout sofisticado.
+● layout sofisticado.
 
 Como entregar
 
