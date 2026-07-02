@@ -1,10 +1,10 @@
-const AppError = require('../errors/AppError');
+const AppError = require('../utils/AppError');
 const productRepository = require('../repositories/product.repository');
 const { createRedisClient } = require('../config/redis');
 const {
   PRODUCTS_CACHE_KEY,
   getProductsCacheTtl,
-} = require('../constants/cache');
+} = require('../utils/cache');
 
 async function listProducts() {
   const redis = createRedisClient();

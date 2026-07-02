@@ -1,4 +1,4 @@
-const AppError = require('../errors/AppError');
+const AppError = require('../utils/AppError');
 const { validateCheckout } = require('../schemas/checkout.schema');
 const { ORDER_STATUS } = require('../models/Order');
 const productRepository = require('../repositories/product.repository');

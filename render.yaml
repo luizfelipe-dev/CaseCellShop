@@ -7,7 +7,7 @@ services:
     ipAllowList: []
 
   - type: web
-    name: CaseCellShop
+    name: casecellshop-api
     runtime: node
     plan: free
     region: oregon
@@ -44,5 +44,5 @@ services:
       - key: VITE_API_URL
         fromService:
           type: web
-          name: CaseCellShop
+          name: casecellshop-api
           envVarKey: RENDER_EXTERNAL_URL
