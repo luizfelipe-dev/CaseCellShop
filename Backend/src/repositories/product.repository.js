@@ -17,6 +17,7 @@ async function findAllWithStock() {
     name: product.name,
     price: product.price,
     description: product.description,
+    imageUrl: product.imageUrl || '',
     stock: stockByProductId.get(toIdString(product._id)) ?? 0,
   }));
 }

@@ -48,6 +48,21 @@ describe('POST /checkout', () => {
     expect(mockQueue.add).toHaveBeenCalledTimes(1);
   });
 
+  it('decrementa o estoque pela quantidade comprada', async () => {
+    const product = products[0];
+
+    const response = await request(app).post('/checkout').send({
+      uid: randomUUID(),
+      productId: product._id.toString(),
+      amount: 3,
+    });
+
+    expect(response.status).toBe(202);
+
+    const stock = await Stock.findOne({ productId: product._id });
+    expect(stock.quantity).toBe(7);
+  });
+
   it('retorna 400 para payload inválido', async () => {
     const response = await request(app).post('/checkout').send({
       uid: 'invalido',

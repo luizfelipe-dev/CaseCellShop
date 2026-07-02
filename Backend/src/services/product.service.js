@@ -19,7 +19,8 @@ async function listProducts() {
     PRODUCTS_CACHE_KEY,
     JSON.stringify(products),
     'EX',
-    getProductsCacheTtl()
+    getProductsCacheTtl(),
+    'NX'
   );
 
   return products;
