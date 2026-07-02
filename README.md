@@ -10,8 +10,8 @@ Monorepo com backend Node.js e frontend React para fluxo de checkout de capinhas
 CaseCellShop/
 ├── Backend/     # API Node.js + MongoDB + Redis + BullMQ
 ├── Frontend/    # React (Vite)
-├── Desafio_Parte_1A.MD
-├── Desafio_Parte_1B.MD
+├── Desafio_Parte_1A.MD  (Perguntas com as respostas)
+├── Desafio_Parte_1B.MD  (Orientação sobre o desafio técnico)
 └── prompts.MD
 ```
 
