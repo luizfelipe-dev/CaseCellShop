@@ -1,53 +1,6 @@
-<h1>Bem-vindo(a) ao desafio técnico pleno da CaseCellShop. </h1>
-
-O objetivo deste teste é avaliar como você entende um problema realista, organiza uma solução técnica, toma decisões com trade-offs e entrega uma pequena implementação que demonstre maturidade prática.
-Não esperamos uma solução pronta para produção. Esperamos uma solução coerente, executável, explicada e pequena o suficiente para ser avaliada com clareza.
-
-<h2>Contexto do case:</h2>
-Você foi contratado(a) como Desenvolvedor(a) na CaseCellShop, uma empresa varejista focada na venda de capinhas para celular. A empresa está passando por hipercrescimento: o que antes eram milhares de acessos diários na loja virtual, hoje se transformaram em milhões.
-
-<h2>Arquitetura:</h2>
-
-ERP Central: monolito que gerencia estoque, faturamento, financeiro e contábil. É o coração da empresa.
-
-Loja Virtual: e-commerce que consome produtos, preços e estoque diretamente do ERP via API REST síncrona.
-
-Banco de Dados: ERP utiliza MySQL. Temos acesso de leitura, mas não podemos alterar rotinas, tabelas ou código interno do ERP .
-
-Infraestrutura: tudo hospedado em datacenter próprio, com intenção de evoluir para serviços mais escaláveis.
-
-Monitoramento: há alertas básicos de performance, mas pouca rastreabilidade por pedido ou por requisição.
-
-<h2>Os 3 problemas identificados:</h2>
-
-01 | Performance da vitrine
-A vitrine demora muitos segundos para carregar produtos, frustrando clientes logo no início da jornada.
-
-
-02 | Consistência de estoque
-Vários clientes conseguem comprar o mesmo produto quando o estoque acaba. A empresa está vendendo
-itens que não possui.
-
-
-03 | Resiliência do checkout
-Ao finalizar a compra, a API do ERP demora para processar o pedido e gerar faturamento. A requisição sofre
-timeout e o cliente perde a compra.
-
-
-<h2>Objetivo de evolução:</h2>
-
-A CaseCellShop quer reduzir a dependência direta do ERP nas jornadas críticas da loja, melhorar a
-experiência do cliente e evitar venda sem estoque. A solução deve ser incremental: pense no que pode ser
-construído primeiro, com risco controlado, sem reescrever todo o ERP .
-
-
 <h3>Parte 1.A — Perguntas Conceituais<h3>
 
-Orientação: responda em texto, tópicos ou diagramas simples. Não precisa escrever código nesta parte.
-
-Pergunta 1 — Diagnóstico e trade-offs
-
-● O que você acredita estar causando o problema?
+### O que você acredita estar causando o problema?
 
 O problema pode estar sendo causado por vários motivos:
     Para carregar os produtos da vitrine, há falta de cacheamento da consulta que traz os itens, gerando repetidas consultas ao banco de dados que poderiam ser evitadas. Também pode haver queries com baixa performance que causem gargalo no sistema. 
@@ -56,7 +9,7 @@ O problema pode estar sendo causado por vários motivos:
 
     O checkout está com problemas pois requer que o sistema esteja atendendo todos os usuários sincronicamente, fazendo com que todas as consultas ao ERP sobrecarreguem as APIS.
 
-● Qual é o impacto para o cliente e para o negócio?
+### Qual é o impacto para o cliente e para o negócio?
 
     O impacto é extremamente negativo para o negócio e para os clientes. 
     
@@ -64,7 +17,7 @@ O problema pode estar sendo causado por vários motivos:
 
     Para o cliente, ao notar lentidão e erros ao finalizar compras, optará pela loja concorrente que oferecer um sistema mais rápido e confiável, já que houve quebra de expectativa.
 
-● Quais seriam pelo menos 2 caminhos possíveis de solução?
+### Quais seriam pelo menos 2 caminhos possíveis de solução?
 
 Vitrine:
     Acredito que o caminho mais rápido para o problema da vitrine é armazenar em memória a consulta que traz os produtos, evitando multiplas consultas ao banco de dados e ganhando muita performance, junto com a sensação de um sistema mais ágil. Uma solução técnica pode ser o Redis, sistema open-source para cacheamento muito conhecido.
@@ -82,7 +35,7 @@ Checkout:
 
     Outra solução seria implementar um circuit breaker, pois assim, quando o sistema cair ou ficar lento, já podemos evitar que novas chamadas sejam enviadas e não deixe o sistema ainda mais lento, avisando o usuário que o pedido será processado assim que o sistema voltar ao normal.
 
-● Quais trade-offs, riscos ou custos cada caminho traz
+### Quais trade-offs, riscos ou custos cada caminho traz?
 
 Vitrine: 
     O uso do cache é a opção mais rápida de aplicar, mas deixa a manutenção do código um pouco mais complexa e também deixa os dados desatualizados por um curto período de tempo.
@@ -96,16 +49,16 @@ Checkout:
     Adicionar filas e workers aumentam a complexidade do desenvolvimento e da manutenção do código
     Adicionar circuit-breakers também aumenta a complexidade já que precisaríamos  definir o tempo de abertura e fechamento do circuito e melhorar significativamente o monitoramento das transações
 
-● Qual caminho você priorizaria primeiro e por quê?
+### Qual caminho você priorizaria primeiro e por quê?
 
     Eu utilizaria as primeiras soluções apresentadas acima por serem mais simples e terem impacto rápido, fazendo com que o sistema melhore significativamente em curto período de tempo.
     Caso ainda surja a necessidade de implementação da segunda solução, podemos planejar com calma enquanto a primeira solução já estiver sendo executada e o sistema já se apresentar mais robusto.
 
 <h3>Pergunta 2 — Arquitetura alvo incremental</h3>
 
-Proponha uma arquitetura para evoluir a loja sem depender diretamente do ERP em cada requisição crítica. Na resposta, descreva:
+### Proponha uma arquitetura para evoluir a loja sem depender diretamente do ERP em cada requisição crítica. Na resposta, descreva:
 
-● componentes principais;
+Componentes principais;
 
 Front-end em JS + React (tenho pouca prática com Typescript e POO);
 API da Loja (Node.js);
@@ -115,7 +68,7 @@ Fila de mensagens (RabbitMQ);
 Worker para processamento assíncrono do checkout (BullMQ);
 Jobs de sincronização entre ERP e banco da loja.
 
-● fluxo de dados para produtos, estoque e checkout;
+### qual o fluxo de dados para produtos, estoque e checkout?
 
 Os produtos seriam sincronizados periodicamente do ERP para o banco da loja através de um Job. A vitrine consultaria apenas o banco da loja, utilizando Redis para cache das consultas mais frequentes
 
@@ -124,7 +77,7 @@ O estoque também seria sincronizado periodicamente com o ERP. Durante o checkou
 No checkout, a API valida os dados, reserva o estoque e registra o pedido no banco da loja. Depois, enviamos uma mensagem para uma fila onde um worker consome essa fila e faz a integração com o ERP
 
 
-● onde usaria cache, fila, banco próprio da loja, jobs ou workers;
+### onde usaria cache, fila, banco próprio da loja, jobs ou workers?
 
 Usaria cacheamento nas consultas dos produtos mais acessados, e/ou num get principal da vitrine
 
@@ -136,12 +89,12 @@ Usaria worker p/ consumir a fila, processar os pedidos, realizar retentativas e 
 
 Usaria os jobs pra sincronizar produtos, preços e estoque entre ERP e banco da loja
 
-● como lidaria com sincronização entre loja e ERP;
+### como lidaria com sincronização entre loja e ERP?
 
 Através dos jobs, que são uma espécie de agendadores de serviços que estipulamos um período para que seja feita a sincronização. Seria importante agendar em um momento do dia em que haja baixa atividade no sistema
 
 
-● o que você implementaria primeiro em um plano de 30 a 90 dias.
+### o que você implementaria primeiro em um plano de 30 a 90 dias?
 
 Na ordem, eu faria assim:
 
@@ -159,22 +112,20 @@ Na ordem, eu faria assim:
     Implementação de monitoria com logs mais precisos
     Bonus: Caso haja tempo, analisar substituição da sincronização periódica por webhooks 
 
-
-
-Pergunta 3 — Estoque, concorrência e idempotência
+<h3>Pergunta 3 — Estoque, concorrência e idempotência</h3>
 Imagine que dois clientes tentam comprar a última unidade do mesmo produto ao mesmo tempo.
 
-● como sua solução evita venda duplicada;
+### como sua solução evita venda duplicada?
 
     A venda duplicada é evitada através da implementação do sistema de reserva de estoque.
 
     No checkout, antes de enviar o pedido ao ERP, a API da loja verifica a disponibilidade do produto e realiza uma reserva no banco de dados em uma transação. Se 2 clientes tentarem comprar a última unidade ao mesmo tempo, apenas a primeira transação conseguirá reservar o item; a segunda receberá uma mensagem de erro informando que o produto não está mais dispon;ivel
 
-● se existe reserva de estoque, quando ela é criada e quando expira;
+### se existe reserva de estoque, quando ela é criada e quando expira?
 
     Podemos reservar o estoque quando o usuario entra no checkout e podemos estipular um tempo, por exemplo, 15 minutos, para voltar ao estoque caso não efetue a compra
 
-● como o checkout lida com retry, timeout ou duplo clique;
+### como o checkout lida com retry, timeout ou duplo clique?
 
     Após validar os dados e reservar o estoque, a API registra o pedido e o envia para a fila, onde o worker fica responsável por realizar a integração com o ERP.
 
@@ -183,11 +134,11 @@ Imagine que dois clientes tentam comprar a última unidade do mesmo produto ao m
     Pra evitar casos de duplo clique, implementanos no front a desabilitação do botão após primeiro clique de finalizar a compra. No backend, usamos um id para garantir que a mesma compra não seja processada mais de uma vez.
 
 
-● como usaria idempotência para evitar pedidos duplicados:
+### como usaria idempotência para evitar pedidos duplicados?
 
     Cada requisição no checkout deve possuir um id único pra que seja verificado no banco se a mesma já foi solicitada.
 
-● como reconciliaria divergências entre loja e ERP .
+### como reconciliaria divergências entre loja e ERP?
 
     Utilizaria os jobs para periodicamente comparar o banco da loja com o banco do ERP e atualizar caso haja diferenças
     Tambem adicionaria formas de salvar em banco essas diferenças para maior controle como em uma tabela separada salvando a data da sincronizacao e a diferenca entre tabelas
@@ -195,10 +146,10 @@ Imagine que dois clientes tentam comprar a última unidade do mesmo produto ao m
 
 <h3>Pergunta 4 — Contrato de API e modelo de erros</h3>
 
-Defina um contrato para o endpoint principal de checkout, por exemplo POST /checkout ou POST /orders.
+### Defina um contrato para o endpoint principal de checkout, por exemplo POST /checkout ou POST /orders.
 Inclua:
 
-● payload mínimo de entrada;
+### payload mínimo de entrada;
 
     {
         "uid": "3d8f4d7a-91d5-4f67-a3c5-0b6ef4c91234",
@@ -207,7 +158,7 @@ Inclua:
     }
 
 
-● resposta de sucesso;
+### resposta de sucesso;
 
     Status 202 (pois há filas)
 
@@ -215,7 +166,7 @@ Inclua:
         "message": "O pedido foi recebido com sucesso e será processado" 
     }
 
-● resposta para erro de validação;
+### resposta para erro de validação;
 
     Status 400
 
@@ -224,7 +175,7 @@ Inclua:
         "message": "Dados inválidos." 
     }
 
-● resposta para estoque insuficiente;
+### resposta para estoque insuficiente;
 
     Status 400
 
@@ -234,7 +185,7 @@ Inclua:
     }
 
 
-● resposta para falha temporária do ERP ou processamento assíncrono;
+### resposta para falha temporária do ERP ou processamento assíncrono;
 
     Status: 500 ou 503
 
@@ -244,39 +195,39 @@ Inclua:
     }
 
 
-● códigos HTTP , errorCode e mensagem amigável quando fizer sentido;
-● como o front-end deveria reagir a cada tipo de erro.
+Códigos HTTP , errorCode e mensagem amigável quando fizer sentido;
+### Como o front-end deveria reagir a cada tipo de erro?
 
     O frontend pode utilizar o campo message para retornar as mensagens do jeito que o backend entrega ou utilizar o campo errorCode para personalizar uma mensagem própria.
 
 <h3>Pergunta 5 — Testes e estratégia de validação</h3>
+### Descreva como você testaria a solução.
 
-Descreva como você testaria a solução.
 Considere:
-● testes unitários;
+### testes unitários;
     Usaria para validar dados e validar estoque
 
-● testes de integração da API;
+### testes de integração da API;
     Usaria em listagem de produtos, em checkout com sucesso ou de erros, em erros de validação, em quando o sistema do ERP ficar lento ou indisponivel
 
-● testes de contrato entre front-end e back-end;
+### testes de contrato entre front-end e back-end;
     Usaria nos status e nos campos do contrato, principalmente nos errorCode
 
-● cenários de concorrência ou múltiplas tentativas;
+### cenários de concorrência ou múltiplas tentativas;
     Tentaria simular uma compra com e sem concorrência
 
-● testes de estados do front-end;
+### testes de estados do front-end;
     Usaria nos carregamentos dos produtos, no botão para evitar duplo clique, nas mensagens de sucesso e de erro
 
 
-● o que você automatizaria agora e o que deixaria documentado como próximo passo.
+### o que você automatizaria agora e o que deixaria documentado como próximo passo.
     Começaria pelo mais simples que são os testes unitários, depois seguiria para os testes de integração com a API e por ultimo os testes de concorrência e de queda no sistema 
 
 
 <h3>Pergunta 6 — Uso de IA no desenvolvimento</h3>
 Se usar IA para apoiar a solução:
 
-● que tipo de prompt você usaria?
+### que tipo de prompt você usaria?
 
     Eu implementaria com IA-First, usando IA desde o início da implementação e ao longo de todo o desenvolvimento, para ganhar tempo.
 
@@ -287,13 +238,13 @@ Se usar IA para apoiar a solução:
         - As tecnologias a serem utilizadas
 
 
-● que partes você delegaria ou não delegaria à IA?
+### que partes você delegaria ou não delegaria à IA?
 
     Usaria a IA em todas as etapas do processo - na arquitetura, na implementação, no desenvolvimento dos testes e da documentação, assim ganhamos muito tempo.
 
     Porém a decisão final sobre arquitetura, das regras de negócio e dos trade-offs sempre devem ser do desenvolvedor, e não da IA, servindo ela apenas para acelerar e não para decidir.  
 
-● como verificaria se a resposta está correta?
+### como verificaria se a resposta está correta?
 
     Primeiro verifico as alterações do arquivo modificado apresentado pela IA, onde
     verifico pontos essenciais das modificações como regras de negócio e qualidade do código. 
@@ -303,6 +254,6 @@ Se usar IA para apoiar a solução:
     Por último, verificamos se os testes automatizados são contemplados e fazemos os testes reais na aplicação
 
 
-● que riscos existem ao aceitar uma sugestão de IA sem revisão?
+### que riscos existem ao aceitar uma sugestão de IA sem revisão?
 
     Os riscos são enormes e podem quebrar totalmente a aplicação. Além disso, pode ser exposto algum dado sigiloso como uma variável de ambiente por exemplo. Também há riscos de comprometer a base de dados ou expor informações sensíveis. 
