@@ -7,6 +7,9 @@ API Node.js para vitrine e checkout de capinhas, com cache Redis, fila BullMQ e 
 - Node.js 18+
 - Docker e Docker Compose
 
+Utilizei javascript por não ter familiaridade com TS e POO
+Deixei as variáveis de ambiente expostas de propósito no exemplo.
+
 ## Instalação e execução
 
 ```bash

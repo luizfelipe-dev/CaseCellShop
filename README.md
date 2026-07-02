@@ -1,6 +1,7 @@
 # CaseCellShop — Desafio Técnico Pleno
 
-## Online em: https://casecellshop-frontend.onrender.com/
+## Online em: https://casecellshop-frontend.onrender.com/ 
+(pode demorar uns instantes para carregar os itens por estar hospedado em plano gratuito)
 
 Monorepo com backend Node.js e frontend React para fluxo de checkout de capinhas.
 
