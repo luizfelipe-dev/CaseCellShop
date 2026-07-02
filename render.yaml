@@ -1,0 +1,48 @@
+services:
+  - type: keyvalue
+    name: casecellshop-redis
+    plan: free
+    region: oregon
+    maxmemoryPolicy: noeviction
+    ipAllowList: []
+
+  - type: web
+    name: CaseCellShop
+    runtime: node
+    plan: free
+    region: oregon
+    branch: master
+    buildCommand: npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: casecellshop-redis
+          property: connectionString
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: casecellshop-frontend
+          envVarKey: RENDER_EXTERNAL_URL
+
+  - type: web
+    name: casecellshop-frontend
+    runtime: static
+    plan: free
+    region: oregon
+    branch: master
+    rootDir: Frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: CaseCellShop
+          envVarKey: RENDER_EXTERNAL_URL

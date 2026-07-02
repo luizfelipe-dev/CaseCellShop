@@ -1,0 +1,10 @@
+{
+  "name": "casecellshop",
+  "private": true,
+  "version": "1.0.0",
+  "description": "CaseCellShop monorepo — scripts de deploy no Render",
+  "scripts": {
+    "build": "npm install --prefix Backend",
+    "start": "npm start --prefix Backend"
+  }
+}

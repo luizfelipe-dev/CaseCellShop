@@ -39,7 +39,6 @@ function OrdersPage() {
         <div className="section-heading section-heading--row">
           <div>
             <h2>Meus Pedidos</h2>
-            <p>Histórico de pedidos com status completo</p>
           </div>
           <button type="button" className="page-panel__refresh" onClick={loadOrders}>
             Atualizar

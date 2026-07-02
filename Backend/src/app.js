@@ -9,7 +9,14 @@ const errorHandler = require('./middlewares/errorHandler');
 function createApp() {
   const app = express();
 
-  app.use(cors());
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    'http://localhost:5173',
+  ].filter(Boolean);
+
+  app.use(cors({
+    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
+  }));
   app.use(express.json());
 
   app.get('/health', (_req, res) => {

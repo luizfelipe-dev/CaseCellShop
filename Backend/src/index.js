@@ -1,14 +1,30 @@
 require('dotenv').config();
 
 const createApp = require('./app');
+const Product = require('./models/Product');
 const { connectDatabase } = require('./config/database');
 const { createRedisClient } = require('./config/redis');
+const runSeed = require('./seeds/runSeed');
 const { startErpWorker } = require('./workers/erp.worker');
 
 const PORT = process.env.PORT || 3001;
 
+async function ensureSeedData() {
+  const productCount = await Product.countDocuments();
+  if (productCount === 0) {
+    const count = await runSeed();
+    console.log(JSON.stringify({
+      level: 'info',
+      event: 'seed_completed',
+      products: count,
+      timestamp: new Date().toISOString(),
+    }));
+  }
+}
+
 async function bootstrap() {
   await connectDatabase();
+  await ensureSeedData();
   createRedisClient();
   startErpWorker();
 
